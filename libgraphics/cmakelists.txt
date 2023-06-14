@@ -1,0 +1,2 @@
+aux_source_directory(. ALL_SRC)
+add_library(libgraphics ${ALL_SRC})

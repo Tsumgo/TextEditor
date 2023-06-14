@@ -1,0 +1,8 @@
+// 这是一段测试文本
+#include <cstdio>
+using namespace std;
+int main()
+{
+    puts("Hello chicken");
+    return 0;
+}sd
