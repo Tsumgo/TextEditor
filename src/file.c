@@ -12,14 +12,11 @@ extern PtrToLine tailLine;
 
 static FILE *currentFile; // 当前文件
 OPENFILENAMEA ofn;        // utf-8 格式
-// static char szFile[512];  // 存储文件名
-// static char szFileTitle[512];
-static int isSaved;   // 是否保存
-static int isCreated; // 是否被创建
-// static char s[1010];  // 临时用
-static LPWSTR msg;
-static WCHAR szFile;
-static WCHAR szFileTitle[512];
+static char szFile[512];  // 存储文件名
+static char szFileTitle[512];
+static int isSaved;           // 是否保存
+static int isCreated;         // 是否被创建
+static char msg[1010];        // 临时用
 static int isProcessFile = 0; // 程序是否在读取/输出数据
 
 int getFileProcessState()
@@ -107,12 +104,11 @@ void openFile()
     isProcessFile = 1;
 
     int state;
-    MessageBoxA(NULL, "你好", "TextEditor", MB_OK);
     if (!isSaved)
     {
         if (!isCreated)
         {
-            msg = "是否要保存对 无标题 的更改？";
+            sprintf(msg, "是否要保存对 无标题 的更改？");
         }
         else
         {
@@ -152,7 +148,7 @@ void openFile()
     ofn.lpstrInitialDir = NULL;
     ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
-    if (GetOpenFileNameW(&ofn))
+    if (GetOpenFileNameA(&ofn))
     {                                             // GetOpenFileName打开一个文本对话框，该对话框的信息由ofn提供
         currentFile = fopen(ofn.lpstrFile, "r+"); // 打开对话框中我们自己命名的文件，返还指向该文件的指针，用于把文本信息（缓冲区）写入文件（内存）
         if (!currentFile)
@@ -181,9 +177,9 @@ void openFile()
 
     InitGUI(); // 这个可有可无，功能与ZeroMemory相同
 
-    setCursor((blockNode){1, 1}); // 光标位置的重置，与键盘和字符回调函数相关，在文件保存这里暂时不起作用
-    setStartSelect((blockNode){1, 1});
-    setEndSelect((blockNode){1, 1});
+    setCursor((blockNode){0, 0}); // 光标位置的重置，与键盘和字符回调函数相关，在文件保存这里暂时不起作用
+    setStartSelect((blockNode){0, 0});
+    setEndSelect((blockNode){0, 0});
 
     // 将currentFile所指文件（我们选择打开的那个文件）的内容读入到链表里面 ，链表内容作为文本显示在屏幕上
     PtrToLine p = headLine; // 指针p用于遍历链表
@@ -206,12 +202,11 @@ void createFile()
 {
     if (isProcessFile)
         return; // 正在处理文件（有对话框被打开时），拒绝二次相应
-    // isProcessFile = 1;
     if (!isSaved)
     { // 未保存（发生修改）
         if (!isCreated)
         { // 文件未被创建，文本信息（咱们的链表结构里面的Text）没有被存放进去
-            msg = "是否要保存对 无标题 的更改？";
+            sprintf(msg, "是否要保存对 无标题 的更改？");
         }
         else
         {
@@ -242,7 +237,7 @@ void exitApplication()
     {
         if (!isCreated)
         {
-            msg = "是否要保存对 无标题 的更改？";
+            sprintf(msg, "是否要保存对 无标题 的更改？");
         }
         else
         {
