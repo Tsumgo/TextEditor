@@ -15,10 +15,8 @@
 
 #define REFREASH 1
 
-// 全局变量
-static double winwidth, winheight; // 窗口尺寸
+static double winwidth, winheight;
 
-// 仅初始化执行一次
 void Main()
 {
     // 初始化窗口和图形系统
@@ -42,9 +40,8 @@ void Main()
     registerMouseEvent(MouseEventProcess);       // 鼠标
     registerTimerEvent(TimerEventProcess);       // 定时器
 
-    puts("Event registered!");
+    // puts("Event registered!");
     startTimer(REFREASH, 500);
 
-    // 打开控制台，方便用printf/scanf输出/入变量信息，方便调试
-    InitConsole();
+    // InitConsole();
 }

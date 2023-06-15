@@ -83,14 +83,12 @@ void MouseEventProcess(int x, int y, int button, int event)
     case BUTTON_DOWN:
         if (button == LEFT_BUTTON)
         {
-            puts("button down");
             blockNode mouse = getLocation(x, y);
             isButtonDown = 1;
 
             setCursor(mouse);
             setStartSelect(mouse);
             setEndSelect(mouse);
-            // setCursorInWindow();
         }
         // if (getContextMenuDisplayState())
         //     setContextMenuDisplayState(0); // 不显示右键菜单
@@ -101,7 +99,6 @@ void MouseEventProcess(int x, int y, int button, int event)
             blockNode mouse = getLocation(x, y);
             setCursor(mouse);
             setEndSelect(mouse);
-            // setCursorInWindow();
         }
         break;
     case BUTTON_UP:
@@ -111,7 +108,6 @@ void MouseEventProcess(int x, int y, int button, int event)
             isButtonDown = 0;
             setCursor(mouse);
             setEndSelect(mouse);
-            // setCursorInWindow();
         }
         break;
     }

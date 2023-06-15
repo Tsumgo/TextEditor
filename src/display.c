@@ -14,8 +14,6 @@
 #include "display.h"
 #define max(x, y) (x) > (y) ? (x) : (y)
 
-int isShowCursor = 0;
-
 static int lockDisplay = 0;
 static int isShowHelp = 0;        //   show help page
 static int isShowAbout = 0;       //   show about page
@@ -35,10 +33,10 @@ int maxShowC; // 当前界面最多展示的列数
 
 void CreateColors()
 {
-    DefineColor("menuFrame", 7.0 / 255, 143.0 / 255, 149.0 / 255);      // 菜单栏默认颜色
-    DefineColor("menuHotFrame", 0.0 / 255, 255.0 / 255, 255.0 / 255);   // 菜单栏选中颜色
-    DefineColor("menuLable", 255.0 / 255, 204.0 / 255, 204.0 / 255);    // 菜单栏字的颜色
-    DefineColor("menuhotLable", 255.0 / 255, 102.0 / 255, 102.0 / 255); // 菜单栏选中字的颜色
+    DefineColor("menuFrame", 7.0 / 255, 143.0 / 255, 149.0 / 255);
+    DefineColor("menuHotFrame", 0.0 / 255, 255.0 / 255, 255.0 / 255);
+    DefineColor("menuLable", 255.0 / 255, 204.0 / 255, 204.0 / 255);
+    DefineColor("menuhotLable", 255.0 / 255, 102.0 / 255, 102.0 / 255);
     DefineColor("Pink", 255.0 / 255, 192.0 / 255, 203.0 / 255);
     DefineColor("Background", 30.0 / 255, 30.0 / 255, 30.0 / 255);
     DefineColor("backgroundcolor", 255.0 / 255, 255.0 / 255, 204.0 / 255);
@@ -51,6 +49,7 @@ void CreateColors()
 }
 void initDisplay()
 {
+    CreateColors();
     setMenuColors("menuFrame", "menuLable", "menuHotFrame", "menuhotLable", 1);
     setTextBoxColors("White", "BLUE", "White", "BLUE", 0);
 
@@ -71,8 +70,6 @@ void initDisplay()
 
     maxShowR = (winHeight - menuHeight) / textBoxHeight - 1; // 最多展示的行数
     maxShowC = (winWidth - sideBarWidth) / textBoxWidth - 1; // 最多展示的列数
-    printf("MAX:%d %d\n", maxShowR, maxShowC);
-    puts("display Initialized");
 }
 
 static void drawMenu()
@@ -90,7 +87,7 @@ static void drawMenu()
                                    "Redo        Ctrl-Y",
                                    "Cut          Ctrl-X",
                                    "Copy        Ctrl-C",
-                                   "Paste       Ctrl-P",
+                                   "Paste       Ctrl-V",
                                    "Find         Ctrl-F",
                                    "Replace    Ctrl-H"};
     static char *menuListHelp[] = {"Help",
@@ -117,7 +114,7 @@ static void drawMenu()
     case 0:
         break;
     case 1:
-        createFile();
+        newFile();
         break;
     case 2:
         openFile();
@@ -130,7 +127,7 @@ static void drawMenu()
         break;
     }
 
-    // Edit menu, Ctrl+A, Ctrl-C, Ctrl-V, Ctrl-R, Ctrl-X, Ctrl-Z
+    // Edit menu
     wlist = TextStringWidth(menuListEdit[1]) * 1.2;
     selection = menuList(GenUIID(0), x + w, y - menuHeight, w, wlist, menuHeight, menuListEdit, sizeof(menuListEdit) / sizeof(menuListEdit[0]));
     if (selection >= 0)
@@ -147,6 +144,12 @@ static void drawMenu()
         break;
     case 3:
         break;
+    case 4:
+        Copy(getStartSelect(), getEndSelect());
+        break;
+    case 5:
+        Paste();
+        break;
     }
 
     // Help menu
@@ -157,7 +160,6 @@ static void drawMenu()
     switch (selection)
     {
     case 0:
-        // Do something.
         break;
     case 1:
         isShowKeyboard = 1;
@@ -178,7 +180,7 @@ static void drawMenu()
 static void drawKeyboardPage()
 {
     DisplayClear();
-    SetPenColor("Tianyi"); // 这里可以改背景颜色
+    SetPenColor("Tianyi"); // You can Change BackGround Color Here !
     drawRectangle(0, 0, winWidth, winHeight, 1);
 
     SetPenColor("Pink");
@@ -252,11 +254,6 @@ static void drawKeyboardPage()
     {
         display();
     }
-}
-
-static void drawHelpPage()
-{
-    // 这个函数没有用，但是放在这里这个程序就不会出错
 }
 
 static void drawAboutPage()
@@ -363,11 +360,11 @@ static void drawAboutPage()
     }
 }
 
-/*以下函数把一个int型数字变成string并输出，仅支持1~999*/
-void drawnumber(int num)
+/// @brief this function convert a Int number to String and Draw it on the screen.   Right aligns
+/// @param num Must less than 999.
+static void drawnumber(int num)
 {
     int originPenSize = GetPenSize();
-    // SetPointSize(24);
     static char ge[4];
     double cx, cy;
     cx = GetCurrentX();
@@ -401,7 +398,7 @@ void drawnumber(int num)
     DrawTextString(ge);
     SetPenSize(originPenSize);
 }
-// 绘制行号
+
 static void drawSideBar()
 {
     blockNode winCurrent = getWindowCurrent();
@@ -423,10 +420,6 @@ static void drawSideBar()
     for (i = winCurrent.row; i < winCurrent.row + maxShowR; i++)
     {
         SetPenColor("Black");
-        // if (i == winCurrent.row)
-        // {
-        //     MovePen(0.12, 6.52);
-        // }
         double cx = GetCurrentX();
         double cy = GetCurrentY();
 
@@ -447,6 +440,7 @@ static void drawSideBar()
     SetPenSize(cps);
     SetPointSize(cpointsize);
 }
+
 static void drawTextArea()
 {
     SetPenColor("Black");
@@ -465,7 +459,7 @@ static void drawTextArea()
     int wordL = 0;
 
     if (startSelect.col != endSelect.col || startSelect.row != endSelect.row)
-    { // 有选中区域
+    {
         if (startSelect.row > endSelect.row || (startSelect.row == endSelect.row && startSelect.col > endSelect.col))
         {
             blockNode temp = startSelect;
@@ -474,7 +468,6 @@ static void drawTextArea()
         }
     }
 
-    // TODO 背景色
     SetPenColor("backgroundcolor"); // 这里可以改背景颜色
     drawRectangle(sideBarWidth - 0.05, 0, winWidth - sideBarWidth + 0.05, winHeight - menuHeight, 1);
     SetPenColor("Black"); // 把颜色设置回去
@@ -484,8 +477,7 @@ static void drawTextArea()
         // x,y表示 下一个字符在窗口中的位置。
         double x = sideBarWidth;
         double y = winHeight - menuHeight - (row + 1 - windowCurrent.row) * textBoxHeight;
-        drawRectangle(x, y, winWidth, 0, 0); // 画一个方框测试
-        // drawLine(x, y);
+        // drawRectangle(x, y, winWidth, 0, 0);      // 画一个方框测试
         x = x - windowCurrent.col * textBoxWidth; //  这里可能会从负坐标开始画，但不该显示的部分可以被后面的sidebar覆盖掉。
         int i;
 
@@ -493,7 +485,7 @@ static void drawTextArea()
         if (startSelect.row != endSelect.row)
         {
             if (row > startSelect.row && row < endSelect.row)
-            { // 这一行都选中
+            {
                 SetPenColor("Selected");
                 drawRectangle(sideBarWidth, winHeight - menuHeight - (row - windowCurrent.row + 1) * textBoxHeight, curLine->Len * textBoxWidth - textBoxWidth, textBoxHeight, 1);
                 SetPenColor("Black");
@@ -519,33 +511,36 @@ static void drawTextArea()
             SetPenColor("Black");
         }
 
+        // double ChWide =
         for (i = 0; i < curLine->Len - 1; i++)
         {
             if (curLine->Text[i] & 0x80)
             {
+                // drawRectangle(x, x, textBoxWidth, textBoxHeight, 0);
                 Word[wordL++] = curLine->Text[i];
                 Word[wordL++] = curLine->Text[i + 1];
                 Word[wordL] = '\0';
                 MovePen(x + (textBoxWidth * 2 - TextStringWidth(Word)) / 2, y);
                 DrawTextString(Word);
                 wordL = 0;
-                // drawRectangle(x, y, textBoxWidth * 2, textBoxHeight, 0);
                 x = x + textBoxWidth * 2.0;
                 i++;
             }
             else
             {
+                // drawRectangle(x, y, textBoxWidth * 2, textBoxHeight, 0);
                 Word[wordL++] = curLine->Text[i];
                 Word[wordL] = '\0';
                 MovePen(x + (textBoxWidth - TextStringWidth(Word)) / 2, y);
                 DrawTextString(Word);
-                // drawRectangle(x, y, textBoxWidth, textBoxHeight, 0);
                 x = x + textBoxWidth;
                 wordL = 0;
             }
         }
 
         drawSideBar();
+
+        // Draw Cursor
         if (clock() % 1000 < 500)
         { // 500ms的间隔闪烁，不在输入状态时不显示光标
             int originPenSize = GetPenSize();
@@ -554,7 +549,7 @@ static void drawTextArea()
             {
                 x = sideBarWidth + (Cur.col - windowCurrent.col) * textBoxWidth;
                 MovePen(x, y);
-                DrawLine(0, textBoxHeight); // 光标高度直接用textBoxHeight
+                DrawLine(0, textBoxHeight);
             }
             SetPenSize(originPenSize);
         }
@@ -573,18 +568,12 @@ void display()
     lockDisplay = 1;
     DisplayClear();
 
-    CreateColors();
     winHeight = GetWindowHeight();
     winWidth = GetWindowWidth();
-    // updateTotalDisplayRow();
 
     if (isShowAbout)
     {
         drawAboutPage();
-    }
-    else if (isShowHelp)
-    {
-        drawHelpPage();
     }
     else if (isShowKeyboard)
     {

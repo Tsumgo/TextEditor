@@ -19,15 +19,17 @@ static char Word[5];
 static int wordL = 0;
 extern Stack Undo, Redo;
 
-// 区分当前输入字符
-int Divide(char ch)
+/// @brief this fucntion determine What current character is
+/// @param ch the input character
+/// @return if ch is a Chinese, return 2; if it's visible ASCII, return 1; if it's a  RETURN, return 0;
+static int Divide(char ch);
+
+static int Divide(char ch)
 {
     if (ch & 0x80)
-        return 2; // 中文
+        return 2;
     if (ch >= 32 && ch <= 126)
-        return 1; // 可见字符
-    // if (ch == 10)
-    // return 0; // 回车
+        return 1;
     if (getUIState().keyPress == VK_RETURN)
         return 0;
     return -1;
@@ -40,27 +42,24 @@ void CharEventProcess(char ch)
     endSelect = getEndSelect();
 
     int opt = Divide(ch);
-    // printf("Option :%d\n", opt);
     switch (opt)
     {
-    case 2: // 中文
+    case 2:
         Word[wordL++] = ch;
         Word[wordL] = '\0';
         break;
-    case 1: // 其他可见字符
+    case 1:
         Word[wordL++] = ch;
         Word[wordL] = '\0';
         break;
-    case 0: // 回车
+    case 0:
         Word[wordL++] = '\n';
         Word[wordL] = '\0';
         break;
-    default: // 控制字符, 直接退出函数
+    default:
         return;
         break;
     }
-    // if (opt == 0)
-    //     puts("retur 1 ");
     if (opt == 0 || opt == 1 || (opt == 2 && wordL == 2))
     {
         if ((startSelect.col != endSelect.col || startSelect.row != endSelect.row))
@@ -76,13 +75,12 @@ void CharEventProcess(char ch)
             stkPush(&Undo, event);
 
             deleteContent(startSelect, endSelect);
-            Cur = startSelect; // 重定位光标
+            Cur = startSelect;
             endSelect = startSelect;
         }
         blockNode inputEnd = inputContent(Cur, Word, wordL);
         PtrToLine inpBuf = getContentFromBuf(Word, wordL);
         PtrToRecord event = newRecord(1, Cur, startSelect, endSelect, Cur, inputEnd, inpBuf);
-        // printf("Cursor: %d %d; Select: %d %d to %d %d\n", ().row, getCursor().col, getStartSelect().row, getStartSelect().col, getEndSelect().row, getEndSelect().col);
 
         stkPush(&Undo, event);
         wordL = 0;
@@ -92,7 +90,5 @@ void CharEventProcess(char ch)
         setStartSelect(inputEnd);
         setEndSelect(inputEnd);
     }
-
-    printAllLine();
     display();
 }

@@ -1,6 +1,7 @@
 #ifndef model_h
 #define model_h
 
+/// @brief A struct like vector
 typedef struct lineNode
 {
     char *Text;
@@ -15,7 +16,7 @@ typedef struct blockNode
 {
     int row;
     int col;
-} blockNode; // which row and column the cursor at .
+} blockNode;
 
 void Insert(PtrToLine line, int pos, char *Buf, int bufLen);
 
@@ -23,7 +24,7 @@ void PushBack(PtrToLine line, char x);
 
 void Erase(PtrToLine line, int start, int end);
 
-PtrToLine newLineNode(); //  End with '\0'
+PtrToLine newLineNode();
 
 void deleteLineNode();
 
@@ -33,27 +34,29 @@ void printAllLine();
 
 void gotoXLine(int x);
 // ============= List ==========================
-int getTotalRow(); //****链表跑一遍，计算当前有多少行
 
-blockNode getCursor(); //****
+int getTotalRow();
 
-blockNode getStartSelect(); //****
+blockNode getCursor();
 
-blockNode getEndSelect(); //****
+blockNode getStartSelect();
 
-PtrToLine getCurLine(); //****
+blockNode getEndSelect();
+
+PtrToLine getCurLine();
 
 blockNode getWindowCurrent();
 
-void setCurLine(PtrToLine new_curLine); //****
+void setCurLine(PtrToLine new_curLine);
 
-void setCursor(blockNode new_cursor); //****
+void setCursor(blockNode new_cursor);
 
-void setStartSelect(blockNode new_startSelect); //****
+void setStartSelect(blockNode new_startSelect);
 
-void setEndSelect(blockNode new_endSelect); //****
+void setEndSelect(blockNode new_endSelect);
 
 void updateWinCurrent(blockNode Cur);
 
+/// @brief  set Cursor to (0,0) and clear all text contents.
 void initModel();
 #endif

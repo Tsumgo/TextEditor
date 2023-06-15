@@ -105,7 +105,7 @@ void Erase(PtrToLine line, int start, int end)
 }
 
 // ========================== List ===========================
-PtrToLine newLineNode() //  End with '\0'
+PtrToLine newLineNode()
 {
     PtrToLine line = (PtrToLine)malloc(sizeof(lineNode));
     if (line == NULL)
@@ -118,7 +118,6 @@ PtrToLine newLineNode() //  End with '\0'
     return line;
 }
 
-// Delete line;  if cur line is head line, do nothing. // 会移动光标
 void deleteLineNode(PtrToLine line)
 {
     if (line == headLine)
@@ -277,6 +276,4 @@ void initModel()
     }
     tailLine = curLine = headLine = newLineNode();
     TotalRow = 1;
-
-    puts("Model Initialized!");
 }

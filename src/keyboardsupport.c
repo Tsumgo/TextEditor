@@ -338,7 +338,6 @@ void End()
 void KeyboardEventProcess(int key, int event)
 {
     uiGetKeyboard(key, event);
-    // 上一次事件后的鼠标位置与行位置
 
     Cur = getCursor();
     startSelect = getStartSelect();
@@ -355,28 +354,18 @@ void KeyboardEventProcess(int key, int event)
         {
         case VK_LEFT:
             TurnBack();
-            // printAllLine();
-            // printf("Cursor: %d %d; Select: %d %d to %d %d\n", getCursor().row, getCursor().col, getStartSelect().row, getStartSelect().col, getEndSelect().row, getEndSelect().col);
             break;
         case VK_RIGHT:
             TurnForward();
-            // printAllLine();
-            // printf("Cursor: %d %d; Select: %d %d to %d %d\n", getCursor().row, getCursor().col, getStartSelect().row, getStartSelect().col, getEndSelect().row, getEndSelect().col);
             break;
         case VK_UP:
             TurnUp();
-            // printAllLine();
-            // printf("Cursor: %d %d; Select: %d %d to %d %d\n", getCursor().row, getCursor().col, getStartSelect().row, getStartSelect().col, getEndSelect().row, getEndSelect().col);
             break;
         case VK_DOWN:
             TurnDown();
-            // printAllLine();
-            // printf("Cursor: %d %d; Select: %d %d to %d %d\n", getCursor().row, getCursor().col, getStartSelect().row, getStartSelect().col, getEndSelect().row, getEndSelect().col);
             break;
         case VK_BACK:
             BackSpace();
-            // printAllLine();
-            // printf("Cursor: %d %d; Select: %d %d to %d %d\n", getCursor().row, getCursor().col, getStartSelect().row, getStartSelect().col, getEndSelect().row, getEndSelect().col);
             break;
         case VK_DELETE:
             Delete();

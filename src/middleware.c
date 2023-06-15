@@ -119,14 +119,16 @@ PtrToLine getContent(blockNode startSelect, blockNode endSelect)
     PtrToLine curLine = getCurLine();
     int i, rowlenth;
     PtrToLine dst = newLineNode();
+
+    if (startSelect.row == endSelect.row)
+    {
+        Insert(dst, dst->Len - 1, curLine->Text + startSelect.col, endSelect.col - startSelect.col);
+        return dst;
+    }
     rowlenth = endSelect.row - startSelect.row + 1;
     for (i = 0; i < rowlenth; i++)
     {
-        if (i == 0 && i == rowlenth - 1)
-        {
-            Insert(dst, dst->Len - 1, curLine->Text + startSelect.col, curLine->Len - startSelect.col - 1);
-        }
-        else if (i == 0)
+        if (i == 0)
         {
             Insert(dst, dst->Len - 1, curLine->Text + startSelect.col, curLine->Len - startSelect.col - 1);
             Insert(dst, dst->Len - 1, "\n", 1); // 去掉行末的 \0 改为回车

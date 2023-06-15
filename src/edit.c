@@ -8,10 +8,8 @@
 
 Stack Redo, Undo;
 
-static PtrToLine CopyText; // 用于复制粘贴存放字符串
+static PtrToLine CopyText;
 
-// 下列函数全部用指针传入
-// 在栈 stk中插入一个记录
 void initEdit()
 {
     stkClear(&Redo), stkClear(&Undo);
@@ -52,6 +50,7 @@ void destroyRecord(PtrToRecord reco)
     free(reco->Buf);
     free(reco);
 }
+
 void stkClear(Stack *stk)
 {
     while (stk->Top)
@@ -83,7 +82,6 @@ PtrToRecord newRecord(int opt, blockNode Cur, blockNode startSelect, blockNode e
     return newReco;
 }
 
-// 撤销
 void UnDo()
 {
     PtrToRecord event = stkTop(&Undo);
@@ -111,10 +109,9 @@ void UnDo()
         stkPush(&Redo, event);
         break;
     }
-    printAllLine();
+    // printAllLine();
 }
 
-// 重做
 void ReDo()
 {
     PtrToRecord event = stkTop(&Redo);
@@ -134,8 +131,8 @@ void ReDo()
         setEndSelect(inputEnd);   // event->OpEnd = inputEnd;
         stkPush(&Undo, event);
         break;
-    case 2:                                          // 删除
-        deleteContent(event->OpStart, event->OpEnd); // 删除
+    case 2: // 删除
+        deleteContent(event->OpStart, event->OpEnd);
 
         setCursor(event->OpStart);
         setStartSelect(event->OpStart);
@@ -155,13 +152,16 @@ void Copy(blockNode startSelect, blockNode endSelect)
             startSelect = endSelect;
             endSelect = temp;
         }
-        free(CopyText->Text), free(CopyText);
+        if (CopyText != NULL)
+            free(CopyText->Text), free(CopyText);
         CopyText = getContent(startSelect, endSelect);
     }
 }
 
 void Paste()
 {
+    if (CopyText == NULL)
+        return;
     blockNode startSelect = getStartSelect();
     blockNode endSelect = getEndSelect();
     blockNode Cur = getCursor();
@@ -178,13 +178,17 @@ void Paste()
         stkPush(&Undo, event);
 
         deleteContent(startSelect, endSelect);
-        Cur = startSelect; // 重定位光标
+        Cur = startSelect;
         endSelect = startSelect;
     }
 
-    blockNode intputEnd = inputContent(Cur, CopyText->Text, CopyText->Len - 1);
+    blockNode inputEnd = inputContent(Cur, CopyText->Text, CopyText->Len - 1);
 
     PtrToLine inpBuf = getContentFromBuf(CopyText->Text, CopyText->Len - 1);
-    PtrToRecord event = newRecord(1, Cur, startSelect, endSelect, Cur, intputEnd, inpBuf);
+    PtrToRecord event = newRecord(1, Cur, startSelect, endSelect, Cur, inputEnd, inpBuf);
     stkPush(&Undo, event);
+
+    setCursor(inputEnd);
+    setStartSelect(inputEnd);
+    setEndSelect(inputEnd);
 }

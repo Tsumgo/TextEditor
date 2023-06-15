@@ -3,7 +3,7 @@
 
 void initFileConfig();
 
-void createFile();
+void newFile();
 
 void openFile();
 
