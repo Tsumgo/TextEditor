@@ -32,9 +32,11 @@ void UnDo();
 
 void ReDo();
 
-void Copy(blockNode startSelect, blockNode endSelect);
+void Copy();
 
 void Paste();
+
+void Cut();
 
 PtrToRecord stkTop(Stack *stk);
 

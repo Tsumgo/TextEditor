@@ -319,22 +319,6 @@ static void Delete()
     setEndSelect(delStart);
 }
 
-void PageUp()
-{
-}
-
-void PageDown()
-{
-}
-
-void Home()
-{
-}
-
-void End()
-{
-}
-
 void KeyboardEventProcess(int key, int event)
 {
     uiGetKeyboard(key, event);

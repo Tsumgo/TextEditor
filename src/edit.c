@@ -142,8 +142,10 @@ void ReDo()
     }
 }
 
-void Copy(blockNode startSelect, blockNode endSelect)
+void Copy()
 {
+    blockNode startSelect = getStartSelect();
+    blockNode endSelect = getEndSelect();
     if ((startSelect.col != endSelect.col || startSelect.row != endSelect.row))
     {
         if (startSelect.row > endSelect.row || (startSelect.row == endSelect.row && startSelect.col > endSelect.col))
@@ -191,4 +193,31 @@ void Paste()
     setCursor(inputEnd);
     setStartSelect(inputEnd);
     setEndSelect(inputEnd);
+}
+
+void Cut()
+{
+    blockNode Cur = getCursor();
+    blockNode startSelect = getStartSelect();
+    blockNode endSelect = getEndSelect();
+
+    if ((startSelect.col != endSelect.col || startSelect.row != endSelect.row))
+    {
+        if (startSelect.row > endSelect.row || (startSelect.row == endSelect.row && startSelect.col > endSelect.col))
+        {
+            blockNode temp = startSelect;
+            startSelect = endSelect;
+            endSelect = temp;
+        }
+        Copy(startSelect, endSelect);
+
+        PtrToLine delBuf = getContent(startSelect, endSelect);
+        PtrToRecord event = newRecord(2, Cur, startSelect, endSelect, startSelect, endSelect, delBuf);
+        stkPush(&Undo, event);
+        deleteContent(startSelect, endSelect);
+        setCursor(startSelect);
+        setEndSelect(startSelect);
+        // Cur = startSelect;
+        // endSelect = startSelect;
+    }
 }

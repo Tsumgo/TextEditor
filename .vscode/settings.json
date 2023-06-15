@@ -1,0 +1,9 @@
+{
+  "C_Cpp.errorSquiggles": "enabled",
+  "files.associations": {
+    "middleware.h": "c",
+    "model.h": "c",
+    "keyboardsupport.h": "c",
+    "file.h": "c"
+  }
+}

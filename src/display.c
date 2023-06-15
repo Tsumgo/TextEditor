@@ -143,9 +143,10 @@ static void drawMenu()
         ReDo();
         break;
     case 3:
+        Cut();
         break;
     case 4:
-        Copy(getStartSelect(), getEndSelect());
+        Copy();
         break;
     case 5:
         Paste();
@@ -166,8 +167,6 @@ static void drawMenu()
         break;
     case 2:
         isShowAbout = 1;
-        break;
-    case 3:
         break;
     }
 
@@ -511,7 +510,6 @@ static void drawTextArea()
             SetPenColor("Black");
         }
 
-        // double ChWide =
         for (i = 0; i < curLine->Len - 1; i++)
         {
             if (curLine->Text[i] & 0x80)
