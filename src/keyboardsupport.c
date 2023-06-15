@@ -25,7 +25,7 @@ extern PtrToLine tailLine;
 
 static blockNode Succ(blockNode now)
 {
-    blockNode succ;
+    // blockNode succ;
     if (now.row == TotalRow - 1 && now.col == tailLine->Len - 1) // 文末
         return now;
     if (now.col == curLine->Len - 1) // 行末
@@ -36,7 +36,7 @@ static blockNode Succ(blockNode now)
 
 static blockNode Pre(blockNode now)
 {
-    blockNode Pre;
+    // blockNode Pre;
     if (now.row == 0 && now.col == 0) // 文首
         return now;
     if (now.col == 0) // 行首
@@ -259,6 +259,7 @@ static void BackSpace()
 
     blockNode delStart, delEnd;
     delEnd = Cur;
+    delStart = Pre(Cur);
     if (Cur.col == 0)
     {
         delStart = (blockNode){Cur.row - 1, curLine->preNode->Len - 1}; // 上一个节点的末尾
@@ -280,34 +281,42 @@ static void BackSpace()
     setEndSelect(delStart);
 }
 
-void Return()
+static void Delete()
 {
-    // if ((startSelect.col != endSelect.col || startSelect.row != endSelect.row))
-    // {
-    //     if (startSelect.row > endSelect.row || (startSelect.row == endSelect.row && startSelect.col > endSelect.col))
-    //     {
-    //         blockNode temp = startSelect;
-    //         startSelect = endSelect;
-    //         endSelect = temp;
-    //     }
-    //     PtrToLine delBuf = getContent(startSelect, endSelect);
-    //     PtrToRecord event = newRecord(2, Cur, startSelect, endSelect, startSelect, endSelect, delBuf);
-    //     deleteContent(startSelect, endSelect);
+    if ((startSelect.col != endSelect.col || startSelect.row != endSelect.row))
+    {
+        if (startSelect.row > endSelect.row || (startSelect.row == endSelect.row && startSelect.col > endSelect.col))
+        {
+            blockNode temp = startSelect;
+            startSelect = endSelect;
+            endSelect = temp;
+        }
+        PtrToLine delBuf = getContent(startSelect, endSelect);                                           // malloc
+        PtrToRecord newReco = newRecord(2, Cur, startSelect, endSelect, startSelect, endSelect, delBuf); // malloc
+        stkPush(&Undo, newReco);
 
-    //     Cur = startSelect; // 重定位光标
-    //     endSelect = startSelect;
-    // }
+        deleteContent(startSelect, endSelect);
+        setCursor(startSelect);
+        setStartSelect(startSelect);
+        setEndSelect(startSelect);
+        return;
+    }
 
-    // int wordL = 1;
-    // char Word[3];
-    // Word[0] = '\n';
-    // Word[1] = '\0';
-    // blockNode intputEnd = inputContent(Cur, Word, 1);
-    // PtrToLine inpBuf = getContentFromBuf(Word, wordL);
-    // PtrToRecord event = newRecord(1, Cur, startSelect, endSelect, Cur, intputEnd, inpBuf);
-    // setCursor(inputEnd);
-    // setStartSelect(inputEnd);
-    // setEndSelect(inputEnd);
+    if (Cur.row == TotalRow - 1 && Cur.col == curLine->Len - 1) // 文末
+        return;
+
+    blockNode delStart, delEnd;
+    delStart = Cur;
+    delEnd = Succ(Cur);
+
+    PtrToLine delBuf = getContent(delStart, delEnd); // malloc
+    PtrToRecord newReco = newRecord(2, Cur, startSelect, endSelect, delStart, delEnd, delBuf);
+    stkPush(&Undo, newReco);
+
+    deleteContent(delStart, delEnd);
+    setCursor(delStart);
+    setStartSelect(delStart);
+    setEndSelect(delStart);
 }
 
 void PageUp()
@@ -368,6 +377,9 @@ void KeyboardEventProcess(int key, int event)
             BackSpace();
             // printAllLine();
             // printf("Cursor: %d %d; Select: %d %d to %d %d\n", getCursor().row, getCursor().col, getStartSelect().row, getStartSelect().col, getEndSelect().row, getEndSelect().col);
+            break;
+        case VK_DELETE:
+            Delete();
             break;
         }
         display();

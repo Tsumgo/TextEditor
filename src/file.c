@@ -43,12 +43,14 @@ void initFileConfig()
 void saveFile()
 {
     isProcessFile = 1;
+    if (isSaved)
+        return;
     if (!isCreated)
     {
         ZeroMemory(&ofn, sizeof(ofn));
         ofn.lStructSize = sizeof(ofn);
         ofn.hwndOwner = NULL;
-        ofn.lpstrFile = szFile; // 这个哪里来
+        ofn.lpstrFile = szFile;
         ofn.lpstrFile[0] = '\0';
         ofn.nMaxFile = sizeof(szFile);
         ofn.lpstrFilter = "文本文档(*.txt)\0*.txt\0所有文件(*.*)\0*.*\0";
@@ -80,18 +82,16 @@ void saveFile()
             return;
         }
     }
-    else
-    {
-        return;
-    }
 
     currentFile = fopen(ofn.lpstrFile, "w+"); // 打开文件
     PtrToLine p = headLine;
-    while (p != NULL)
+    while (p->nxtNode != NULL)
     {
-        fprintf(currentFile, "%s", p->Text); // 把链表里的内容全部读到文件里面，saveFile不会自动同步的
+        fprintf(currentFile, "%s\n", p->Text); // 把链表里的内容全部读到文件里面，saveFile不会自动同步的
+        // fprintf(currentFile, "\n");
         p = p->nxtNode;
     }
+    fprintf(currentFile, "%s", p->Text);
     isSaved = 1;
     isProcessFile = 0;
     fclose(currentFile);
@@ -176,10 +176,7 @@ void openFile()
     // 这一段代码提供了文件的大小信息（内存或者说字节数），可能会用到
 
     InitGUI(); // 这个可有可无，功能与ZeroMemory相同
-
-    setCursor((blockNode){0, 0}); // 光标位置的重置，与键盘和字符回调函数相关，在文件保存这里暂时不起作用
-    setStartSelect((blockNode){0, 0});
-    setEndSelect((blockNode){0, 0});
+    initModel();
 
     // 将currentFile所指文件（我们选择打开的那个文件）的内容读入到链表里面 ，链表内容作为文本显示在屏幕上
     PtrToLine p = headLine; // 指针p用于遍历链表
@@ -190,7 +187,7 @@ void openFile()
         Cur = inputContent(Cur, tmp, Cnt);
     }
     // free(p);
-
+    // printAllLine();
     fclose(currentFile); // 已读完，关闭文件
 
     isSaved = 1;       // 相当于initFileConfig，重置保存状态，如果有进行编辑修改就置0

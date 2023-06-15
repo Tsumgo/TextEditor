@@ -19,9 +19,9 @@ static PtrToLine curLine;       // the line we focus on
 static blockNode windowCurrent; // 当前展示文本左上角的行列坐标，这部分的更新还没有写
 
 // Global Variables;
-PtrToLine headLine;
-PtrToLine tailLine;
-int TotalRow;
+PtrToLine headLine = NULL;
+PtrToLine tailLine = NULL;
+int TotalRow = 0;
 
 extern int maxShowR;
 extern int maxShowC;
@@ -268,6 +268,13 @@ void initModel()
     setStartSelect((blockNode){0, 0});
     setEndSelect((blockNode){0, 0});
     windowCurrent = (blockNode){0, 0};
+
+    if (headLine != NULL)
+    {
+        while (headLine->nxtNode != NULL)
+            deleteLineNode(headLine->nxtNode);
+        free(headLine->Text), free(headLine);
+    }
     tailLine = curLine = headLine = newLineNode();
     TotalRow = 1;
 

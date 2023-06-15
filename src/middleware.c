@@ -24,12 +24,15 @@ blockNode inputContent(blockNode Cur, char *Buf, int bufLen) // 注意使用Cur
     int head = 0, tail = 0;
     gotoXLine(Cur.row);
     PtrToLine curLine = getCurLine();
+
+    PtrToLine CurToEnd = getContent(Cur, (blockNode){Cur.row, curLine->Len - 1}); // 不包括最后的0
+    Erase(curLine, Cur.col, curLine->Len - 1);                                    // 不包括最后的0
     while (tail < bufLen)
     {
         if (Buf[tail] == '\n') // 回车换行了
         {
             // 插入
-            Insert(curLine, Cur.col, Buf + head, tail - head - 1); // 最后的回车不插入
+            Insert(curLine, Cur.col, Buf + head, tail - head); // 最后的回车不插入
             // 新建节点
             PtrToLine newLine = newLineNode();
             newLine->nxtNode = curLine->nxtNode;
@@ -41,10 +44,6 @@ blockNode inputContent(blockNode Cur, char *Buf, int bufLen) // 注意使用Cur
 
             // 更新总行数
             TotalRow++;
-            // printf("ROW :%d\n", TotalRow);
-            // 复制
-            Insert(newLine, 0, curLine->Text + Cur.col, curLine->Len - Cur.col - 1); // 当前行光标之后的复制到下一行
-            Erase(curLine, Cur.col, curLine->Len - 1);                               // 行末 \0 不删除
             // 更新鼠标位置
             Cur = (blockNode){Cur.row + 1, 0};
             curLine = curLine->nxtNode;
@@ -53,8 +52,10 @@ blockNode inputContent(blockNode Cur, char *Buf, int bufLen) // 注意使用Cur
         tail++;
     }
 
-    Insert(curLine, Cur.col, Buf + head, tail - head); // 这里Buf + 1 有可能爆炸   !111111111
+    Insert(curLine, Cur.col, Buf + head, tail - head);
     Cur = (blockNode){Cur.row, Cur.col + tail - head};
+    Insert(curLine, Cur.col, CurToEnd->Text, CurToEnd->Len - 1);
+    free(CurToEnd->Text), free(CurToEnd);
     return Cur;
 }
 
