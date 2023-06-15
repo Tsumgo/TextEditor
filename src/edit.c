@@ -12,8 +12,9 @@ static PtrToLine CopyText; // 用于复制粘贴存放字符串
 
 // 下列函数全部用指针传入
 // 在栈 stk中插入一个记录
-void editInit()
+void initEdit()
 {
+    stkClear(&Redo), stkClear(&Undo);
     Redo.Top = Undo.Top = 0;
     CopyText = NULL;
 }

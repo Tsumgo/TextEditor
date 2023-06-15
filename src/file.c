@@ -6,6 +6,7 @@
 #include "middleware.h"
 #include "imgui.h"
 #include "model.h"
+#include "edit.h"
 
 extern PtrToLine headLine;
 extern PtrToLine tailLine;
@@ -177,6 +178,7 @@ void openFile()
 
     InitGUI(); // 这个可有可无，功能与ZeroMemory相同
     initModel();
+    initEdit();
 
     // 将currentFile所指文件（我们选择打开的那个文件）的内容读入到链表里面 ，链表内容作为文本显示在屏幕上
     PtrToLine p = headLine; // 指针p用于遍历链表

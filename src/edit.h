@@ -27,6 +27,8 @@ typedef struct Stack
     PtrToRecord Stk[50];
 } Stack;
 
+void initEdit();
+
 void stkPush(Stack *stk, PtrToRecord record);
 
 void stkPop(Stack *stk);

@@ -32,7 +32,7 @@ void Main()
     winwidth = GetWindowWidth();
     winheight = GetWindowHeight();
     initDisplay();
-    editInit();
+    initEdit();
     initFileConfig();
 
     initModel();

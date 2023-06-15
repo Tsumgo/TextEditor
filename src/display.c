@@ -11,6 +11,7 @@
 #include "genlib.h"
 #include "edit.h"
 #include "file.h"
+#include "display.h"
 #define max(x, y) (x) > (y) ? (x) : (y)
 
 int isShowCursor = 0;
@@ -34,18 +35,23 @@ int maxShowC; // 当前界面最多展示的列数
 
 void CreateColors()
 {
-    DefineColor("menuFrame", 50.0 / 255, 50.0 / 255, 50.0 / 255);
-    DefineColor("menuHotFrame", 63.0 / 255, 64.0 / 255, 64.0 / 255);
-    DefineColor("menuLable", 140.0 / 255, 140.0 / 255, 140.0 / 255);
+    DefineColor("menuFrame", 7.0 / 255, 143.0 / 255, 149.0 / 255);      // 菜单栏默认颜色
+    DefineColor("menuHotFrame", 0.0 / 255, 255.0 / 255, 255.0 / 255);   // 菜单栏选中颜色
+    DefineColor("menuLable", 255.0 / 255, 204.0 / 255, 204.0 / 255);    // 菜单栏字的颜色
+    DefineColor("menuhotLable", 255.0 / 255, 102.0 / 255, 102.0 / 255); // 菜单栏选中字的颜色
     DefineColor("Pink", 255.0 / 255, 192.0 / 255, 203.0 / 255);
     DefineColor("Background", 30.0 / 255, 30.0 / 255, 30.0 / 255);
-    DefineColor("backgroundcolor", 82.0 / 255, 211.0 / 255, 91.0 / 255);
+    DefineColor("backgroundcolor", 255.0 / 255, 255.0 / 255, 204.0 / 255);
     DefineColor("Selected", 38.0 / 255, 79.0 / 255, 120.0 / 255);
-    DefineColor("Purple", 164.0 / 255, 99.0 / 255, 214.0 / 255);
+    DefineColor("Purple", 204.0 / 255, 204.0 / 255, 255.0 / 255);
+    DefineColor("Miku", 57.0 / 255, 197.0 / 255, 187.0 / 255);
+    DefineColor("Tianyi", 102.0 / 255, 204.0 / 255, 255.0 / 255);
+    DefineColor("Grey", 128.0 / 255, 128.0 / 255, 128.0 / 255);
+    DefineColor("Sideline", 153.0 / 255, 204.0 / 255, 0.0 / 255);
 }
 void initDisplay()
 {
-    setMenuColors("menuFrame", "menuLable", "menuHotFrame", "menuLable", 1);
+    setMenuColors("menuFrame", "menuLable", "menuHotFrame", "menuhotLable", 1);
     setTextBoxColors("White", "BLUE", "White", "BLUE", 0);
 
     SetPointSize(textPointSize);
@@ -63,8 +69,9 @@ void initDisplay()
 
     sideBarWidth = 0.5;
 
-    maxShowR = (winHeight - menuHeight) / textBoxHeight; // 最多展示的行数
-    maxShowC = (winWidth - sideBarWidth) / textBoxWidth; // 最多展示的列数
+    maxShowR = (winHeight - menuHeight) / textBoxHeight - 1; // 最多展示的行数
+    maxShowC = (winWidth - sideBarWidth) / textBoxWidth - 1; // 最多展示的列数
+    printf("MAX:%d %d\n", maxShowR, maxShowC);
     puts("display Initialized");
 }
 
@@ -161,97 +168,81 @@ static void drawMenu()
     case 3:
         break;
     }
+
+    // 下面三行代码是历史遗留产物，删了怪可惜的，留着做纪念吧
+    //  SetPenColor("Blue");
+    //  drawLabel(1, 1, "Most recently selected menu is:");
+    //  drawLabel(1 + TextStringWidth("Most recently selected menu is:"), 1, selectedLabel);
 }
 
 static void drawKeyboardPage()
 {
     DisplayClear();
-    SetPenColor("Purple"); // 这里可以改背景颜色
+    SetPenColor("Tianyi"); // 这里可以改背景颜色
     drawRectangle(0, 0, winWidth, winHeight, 1);
 
-    SetPenColor("Black");
-    SetPointSize(40);
-    drawLabel(1.4, 5.5, "KeyBoard Shortcuts help:");
+    SetPenColor("Pink");
+    drawRectangle(1.5, 0.3, 4.7, 4.6, 1);
 
-    MovePen(0.95, 5);
+    SetPenColor("Grey");
+    SetPointSize(60);
+    drawLabel(0.55, 5.47, "KeyBoard Shortcuts help:");
+    SetPenColor("Miku");
+    drawLabel(0.6, 5.5, "KeyBoard Shortcuts help:");
+
+    MovePen(0.95, 4.9);
     SetPenColor("Yellow");
     SetPenSize(10);
     DrawLine(5.9, 0);
 
-    SetPenColor("Blue");
+    SetPenColor("Cyan");
 
     MovePen(5, 1);
     SetPointSize(10);
 
     SetPointSize(23);
-    drawLabel(2.25, 4.5, "New File");
-    drawLabel(4.5, 4.5, "Ctrl-N");
+    drawLabel(2, 4.5, "New File");
+    drawLabel(4.5, 4.5, "Ctrl+N");
 
-    drawLabel(2.25, 4.1, "Open File");
-    drawLabel(4.5, 4.1, "Ctrl-O");
+    drawLabel(2, 4.1, "Open File");
+    drawLabel(4.5, 4.1, "Ctrl+O");
 
-    drawLabel(2.25, 3.7, "Save");
-    drawLabel(4.5, 3.7, "Ctrl-S");
+    drawLabel(2, 3.7, "Save");
+    drawLabel(4.5, 3.7, "Ctrl+S");
 
-    drawLabel(2.25, 3.3, "Exit");
-    drawLabel(4.5, 3.3, "Ctrl-E");
+    drawLabel(2, 3.3, "Exit");
+    drawLabel(4.5, 3.3, "Ctrl+E");
 
-    drawLabel(2.25, 2.9, "Undo");
-    drawLabel(4.5, 2.9, "Ctrl-Z");
+    drawLabel(2, 2.9, "Undo");
+    drawLabel(4.5, 2.9, "Ctrl+Z");
 
-    drawLabel(2.25, 2.5, "Redo");
-    drawLabel(4.5, 2.5, "Ctrl-Y");
+    drawLabel(2, 2.5, "Redo");
+    drawLabel(4.5, 2.5, "Ctrl+Y");
 
-    drawLabel(2.25, 2.1, "Cut");
-    drawLabel(4.5, 2.1, "Ctrl-X");
+    drawLabel(2, 2.1, "Cut");
+    drawLabel(4.5, 2.1, "Ctrl+X");
 
-    drawLabel(2.25, 1.7, "Copy");
-    drawLabel(4.5, 1.7, "Ctrl-C");
+    drawLabel(2, 1.7, "Copy");
+    drawLabel(4.5, 1.7, "Ctrl+C");
 
-    drawLabel(2.25, 1.3, "Paste");
-    drawLabel(4.5, 1.3, "Ctrl-P");
+    drawLabel(2, 1.3, "Paste");
+    drawLabel(4.5, 1.3, "Ctrl+P");
 
-    drawLabel(2.25, 0.9, "Find");
-    drawLabel(4.5, 0.9, "Ctrl-F");
+    drawLabel(2, 0.9, "Find");
+    drawLabel(4.5, 0.9, "Ctrl+F");
 
-    drawLabel(2.25, 0.5, "Replace:");
-    drawLabel(4.5, 0.5, "Ctrl-H");
+    drawLabel(2, 0.5, "Replace:");
+    drawLabel(4.5, 0.5, "Ctrl+H");
 
-    // 画两个框框
-    SetPenSize(1);
-    SetPenColor("Pink");
-    drawRectangle(0.9, 6.2, 6, -5.8, 0);
-
-    SetPenSize(3);
-    SetPenColor("Blue");
-    drawRectangle(0.85, 6.25, 6.1, -5.9, 0);
-
-    // 画行与行之间的线
-    SetPenSize(5);
-    SetPenColor("Pink");
-    MovePen(0.95, 4.37);
-    DrawLine(5.9, 0);
-    MovePen(0.95, 3.97);
-    DrawLine(5.9, 0);
-    MovePen(0.95, 3.57);
-    DrawLine(5.9, 0);
-    MovePen(0.95, 3.17);
-    DrawLine(5.9, 0);
-    MovePen(0.95, 2.77);
-    DrawLine(5.9, 0);
-    MovePen(0.95, 2.37);
-    DrawLine(5.9, 0);
-    MovePen(0.95, 1.97);
-    DrawLine(5.9, 0);
-    MovePen(0.95, 1.57);
-    DrawLine(5.9, 0);
-    MovePen(0.95, 1.17);
-    DrawLine(5.9, 0);
-    MovePen(0.95, 0.77);
-    DrawLine(5.9, 0);
+    // 来一条分割线
+    SetPenSize(4);
+    SetPenColor("Purple");
+    MovePen(3.7, 0.4);
+    DrawLine(0, 4.3);
 
     // 下面弄一个返回按钮
     SetPenSize(2);
+    SetPenColor("Blue");
     SetPointSize(13);
     if (button(GenUIID(0), 0.3, 6.5, 1, 0.3, "Back"))
     {
@@ -274,7 +265,7 @@ static void drawAboutPage()
 
     // 画个鸟用
 
-    SetPenColor("Orange"); // 这里可以改背景颜色
+    SetPenColor("Tianyi"); // 这里可以改背景颜色
     drawRectangle(0, 0, winWidth, winHeight, 1);
     SetPenColor("Black"); // 把颜色设置回去
 
@@ -324,10 +315,41 @@ static void drawAboutPage()
     DrawArc(3.7, 247.5, 45);
 
     int i = GetPointSize();
+    int m = GetPenSize();
 
     SetPointSize(20);
     drawLabel(6.7, 4.9, "This TextEditor is so Amazing!!");
+
+    // 画框框
+    SetPenSize(4);
+    SetPenColor("Pink");
+    drawRectangle(6.8, 0.8, 2.8, 3.3, 1);
+
+    // 写字
+
+    // About Us
+    SetPointSize(60);
+    SetPenColor("Miku");
+    drawLabel(6.5, 3.8, "About Us");
+
+    // 写什么好呢
+    SetPenColor("Yellow");
+    SetPointSize(20);
+    drawLabel(7, 3.4, "This is a TextEditor.");
+
+    drawLabel(7, 3, "We made it in C,");
+    drawLabel(7, 2.75, "also with libgraphics.");
+
+    drawLabel(7, 2.35, "It's such a hard work,");
+    drawLabel(7, 2.1, "and I hope you like it.");
+
+    SetPenColor("Red");
+    drawLabel(7.8, 1.3, "----The PHANTOM");
+
+    // 恢复
     SetPointSize(i);
+    SetPenSize(m);
+    SetPenColor("Black");
 
     // 再整一个按钮，就也能返回了
     SetPenSize(2);
@@ -416,7 +438,7 @@ static void drawSideBar()
 
         if (i != winCurrent.row + maxShowR - 1)
         {
-            SetPenColor("Purple");
+            SetPenColor("Sideline");
             MovePen(cx - 0.13, cy - 0.04);
             DrawLine(0.52, 0);
         }
@@ -461,9 +483,10 @@ static void drawTextArea()
     {
         // x,y表示 下一个字符在窗口中的位置。
         double x = sideBarWidth;
-        double y = winHeight - menuHeight - (row + 1) * textBoxHeight;
-        drawRectangle(x, y, winWidth, textBoxHeight, 0); // 画一个方框测试
-        x = x - windowCurrent.col * textBoxWidth;        //  这里可能会从负坐标开始画，但不该显示的部分可以被后面的sidebar覆盖掉。
+        double y = winHeight - menuHeight - (row + 1 - windowCurrent.row) * textBoxHeight;
+        drawRectangle(x, y, winWidth, 0, 0); // 画一个方框测试
+        // drawLine(x, y);
+        x = x - windowCurrent.col * textBoxWidth; //  这里可能会从负坐标开始画，但不该显示的部分可以被后面的sidebar覆盖掉。
         int i;
 
         // 绘制选中区域
